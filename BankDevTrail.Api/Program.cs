@@ -1,4 +1,4 @@
-using BankDevTrail.Api.data;
+using BankDevTrail.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
 public class Program
@@ -14,7 +14,10 @@ public class Program
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
-    var app = builder.Build();
+        builder.Services.AddDbContext<BankContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("BankDatabase")));
+
+        var app = builder.Build();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
