@@ -16,9 +16,9 @@ namespace BankDevTrail.Api.Repositories
             await _context.Clientes.AddAsync(cliente);
             await _context.SaveChangesAsync();
         }
-        public async Task<bool> ClienteExistsAsync(Guid clienteId)
+        public async Task<bool> CpfExistsAsync(string cpf)
         {
-            return await _context.Clientes.AsNoTracking().AnyAsync(c => c.Id == clienteId);
+            return await _context.Clientes.AsNoTracking().AnyAsync(c => c.Cpf == cpf);
         }
 
         public async Task<Cliente?> GetByClienteIdAsync(Guid clienteId, bool asNoTracking = true)

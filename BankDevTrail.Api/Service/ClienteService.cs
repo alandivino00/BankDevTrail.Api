@@ -14,11 +14,10 @@ namespace BankDevTrail.Api.Service
         }
 
         public async Task<ClienteViewModel> CreateClienteAsync(ClienteInputModel input)
-        {
-            // validações de negócio
-            var clienteExists = await _repo.ClienteExistsAsync(input.ClienteId);
+        {           
+            var clienteExists = await _repo.CpfExistsAsync(input.Cpf);
             if (clienteExists)
-                throw new InvalidOperationException("Número de cliente já existe.");
+                throw new InvalidOperationException("Cpf já cadastrado.");
 
             var cliente = new Cliente(input.Nome, input.Cpf, input.DataNascimento);
 
