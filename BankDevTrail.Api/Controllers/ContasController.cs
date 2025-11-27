@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BankDevTrail.Api.Dto;
+using BankDevTrail.Api.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankDevTrail.Api.Controllers
@@ -7,27 +8,41 @@ namespace BankDevTrail.Api.Controllers
     [Route("api/contas")]
     public class ContasController : ControllerBase
     {
-        //private readonly IContaService _service = service;
+        private readonly IContaService _service;
 
-        // POST: cria nova conta, valida e retorna 201 com Location
-        //[HttpPost]
-        //public async Task<ActionResult<ContaViewModel>> CreateConta([FromBody] ContaInputModel input)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+        public ContasController(IContaService service)
+        {
+            _service = service;
+        }
 
-        //    try
-        //    {
-        //        var vm = await _service.CreateContaAsync(input);
-        //        return CreatedAtAction(nameof(GetConta), new { numero = vm.Numero }, vm);
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        ModelState.AddModelError(string.Empty, ex.Message);
-        //        return BadRequest(ModelState);
-        //    }
-        //}
+        // POST: api/contas
+        [HttpPost]
+        public async Task<ActionResult<ContaViewModel>> CreateConta([FromBody] ContaInputModel input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            try
+            {
+                var vm = await _service.CreateContaAsync(input);
+                return CreatedAtAction(nameof(GetConta), new { numero = vm.Numero }, vm);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ModelState);
+            }
+        }
 
+        // GET: api/contas/{numero}
+        [HttpGet("{numero}")]
+        public async Task<ActionResult<ContaViewModel>> GetConta(string numero)
+        {
+            var vm = await _service.GetContaAsync(numero);
+            if (vm == null)
+                return NotFound();
+
+            return Ok(vm);
+        }
     }
 }

@@ -22,6 +22,8 @@ public class Program
     builder.Services.AddScoped<BankDevTrail.Api.Repositories.IClienteRepository, BankDevTrail.Api.Repositories.ClienteRepository>();
     builder.Services.AddScoped<BankDevTrail.Api.Service.IClienteService, BankDevTrail.Api.Service.ClienteService>();
 
+    builder.Services.AddScoped<BankDevTrail.Api.Repositories.IContaRepository, BankDevTrail.Api.Repositories.ContaRepository>();
+    builder.Services.AddScoped<BankDevTrail.Api.Service.IContaService, BankDevTrail.Api.Service.ContaService>();
 
     var app = builder.Build();
 

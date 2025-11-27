@@ -15,7 +15,8 @@ namespace BankDevTrail.Api.Repositories
         {
             await _context.Clientes.AddAsync(cliente);
             await _context.SaveChangesAsync();
-        }
+        }        
+
         public async Task<bool> CpfExistsAsync(string cpf)
         {
             return await _context.Clientes.AsNoTracking().AnyAsync(c => c.Cpf == cpf);
@@ -30,6 +31,11 @@ namespace BankDevTrail.Api.Repositories
 
             return await query.Include(c => c.Contas)
                               .FirstOrDefaultAsync(c => c.Id == clienteId);
+        }
+
+        public async Task<bool> ClienteExistsAsync(Guid clienteId)
+        {
+            return await _context.Clientes.AsNoTracking().AnyAsync(c => c.Id == clienteId);
         }
 
     }
