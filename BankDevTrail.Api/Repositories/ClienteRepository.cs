@@ -1,0 +1,36 @@
+﻿using BankDevTrail.Api.Data;
+using BankDevTrail.Api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace BankDevTrail.Api.Repositories
+{
+    public class ClienteRepository : IContaRepository
+    {
+        private readonly BankContext _context;
+        public ClienteRepository(BankContext context)
+        {
+            _context = context;
+        }
+        public async Task AddAsync(Cliente cliente)
+        {
+            await _context.Clientes.AddAsync(cliente);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<bool> ClienteExistsAsync(Guid clienteId)
+        {
+            return await _context.Clientes.AsNoTracking().AnyAsync(c => c.Id == clienteId);
+        }
+
+        public async Task<Cliente?> GetByClienteIdAsync(Guid clienteId, bool asNoTracking = true)
+        {
+            var query = _context.Clientes.AsQueryable();
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            return await query.Include(c => c.Contas)
+                              .FirstOrDefaultAsync(c => c.Id == clienteId);
+        }
+
+    }
+}

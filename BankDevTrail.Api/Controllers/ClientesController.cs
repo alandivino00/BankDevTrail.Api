@@ -1,23 +1,20 @@
-﻿using System;
-using System.Threading.Tasks;
-using BankDevTrail.Api.Data;
+﻿using BankDevTrail.Api.Data;
 using BankDevTrail.Api.Dto;
 using BankDevTrail.Api.Models;
+using BankDevTrail.Api.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BankDevTrail.Api.Controllers
 {
     [Route("api/clientes")]
     [ApiController]
-    public class ClientesController : ControllerBase
+    public class ClientesController(IClienteService service) : ControllerBase
     {
-        private readonly BankContext _context;
-
-        public ClientesController(BankContext context)
-        {
-            _context = context;
-        }        
+        private readonly IClienteService _service = service;
 
         // POST: api/clientes
         [HttpPost]
@@ -26,33 +23,28 @@ namespace BankDevTrail.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var exists = await _context.Clientes.AsNoTracking().AnyAsync(c => c.Cpf == input.Cpf);
-            if (exists)
+            try
             {
-                ModelState.AddModelError(nameof(input.Cpf), "CPF já cadastrado.");
+                var vm = await _service.CreateClienteAsync(input);
+                return CreatedAtAction(nameof(GetCliente), new { id = vm.Id }, vm);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return BadRequest(ModelState);
             }
-
-            var cliente = new Cliente
-            {
-                Nome = input.Nome,
-                Cpf = input.Cpf,
-                DataNascimento = input.DataNascimento
-            };
-
-            await _context.Clientes.AddAsync(cliente);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetCliente), new { id = cliente.Id }, cliente);
+            
         }
 
         // GET: api/clientes/{id}
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<Cliente>> GetCliente(Guid id)
         {
-            var cliente = await _context.Clientes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-            if (cliente == null) return NotFound();
-            return Ok(cliente);
+            var vm = await _service.GetClienteAsync(id);
+            if (vm == null)
+                return NotFound();
+
+            return Ok(vm);
         }
     }
 }

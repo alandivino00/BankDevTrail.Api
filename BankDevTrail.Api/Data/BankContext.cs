@@ -22,6 +22,8 @@ namespace BankDevTrail.Api.Data
                 entity.Property(e => e.Nome).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Cpf).IsRequired().HasMaxLength(14);
                 entity.Property(e => e.DataNascimento).IsRequired(false);
+                
+                entity.HasIndex(e => e.Cpf).IsUnique();
 
                 entity.HasMany(e => e.Contas)
                       .WithOne() 
@@ -41,11 +43,9 @@ namespace BankDevTrail.Api.Data
             modelBuilder.Entity<Transacao>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                
-                entity.Property(e => e.Valor).IsRequired().HasColumnType("decimal(18,2)");
-                
-                entity.Property(e => e.DataHora).IsRequired(false);
 
+                entity.Property(e => e.Valor).IsRequired().HasColumnType("decimal(18,2)");
+                entity.Property(e => e.DataHora).IsRequired(false);
                 entity.Property(e => e.Tipo).IsRequired();
 
                 entity.HasOne<Conta>()

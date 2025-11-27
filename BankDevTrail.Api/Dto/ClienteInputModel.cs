@@ -14,5 +14,6 @@ namespace BankDevTrail.Api.Dto
         public string Cpf { get; set; } = string.Empty;
 
         public DateTime? DataNascimento { get; set; }
+        public Guid ClienteId { get; internal set; }
     }
 }
