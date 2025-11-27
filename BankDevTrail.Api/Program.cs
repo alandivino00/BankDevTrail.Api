@@ -7,17 +7,23 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-    // Add services to the container.
-
-    builder.Services.AddControllers();
+   
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
-        builder.Services.AddDbContext<BankContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("BankDatabase")));
+    builder.Services.AddDbContext<BankContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BankDatabase")));
 
-        var app = builder.Build();
+    // Add services to the container.
+
+    builder.Services.AddControllers();
+
+    builder.Services.AddScoped<BankDevTrail.Api.Repositories.IClienteRepository, BankDevTrail.Api.Repositories.ClienteRepository>();
+    builder.Services.AddScoped<BankDevTrail.Api.Service.IClienteService, BankDevTrail.Api.Service.ClienteService>();
+
+
+    var app = builder.Build();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
@@ -31,6 +37,24 @@ public class Program
     app.UseAuthorization();
 
     app.MapControllers();
+
+    app.MapGet("/health", async (BankContext context) =>
+    {
+        bool canConnect;
+        try
+        {
+            canConnect = await context.Database.CanConnectAsync();
+        }
+        catch
+        {
+            canConnect = false;
+        }
+
+        if (canConnect)
+            return Results.Ok("Meu banco esta funcionando.");
+
+        return Results.Problem("Meu banco falhou");
+    });
 
     app.Run();
     }

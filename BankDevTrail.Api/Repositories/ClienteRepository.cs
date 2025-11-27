@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankDevTrail.Api.Repositories
 {
-    public class ClienteRepository : IContaRepository
+    public class ClienteRepository : IClienteRepository
     {
         private readonly BankContext _context;
         public ClienteRepository(BankContext context)
