@@ -1,6 +1,7 @@
 ﻿using BankDevTrail.Api.Dto;
 using BankDevTrail.Api.Models;
 using BankDevTrail.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankDevTrail.Api.Service
 {
@@ -52,6 +53,31 @@ namespace BankDevTrail.Api.Service
         public async Task<ContaViewModel?> GetContaAsync(string numero)
         {
             var conta = await _contaRepository.GetByNumeroAsync(numero);
+            if (conta == null)
+                return null;
+
+            string titular = string.Empty;
+            if (conta.ClienteId.HasValue)
+            {
+                var cliente = await _clienteRepository.GetByClienteIdAsync(conta.ClienteId.Value, asNoTracking: true);
+                titular = cliente?.Nome ?? string.Empty;
+            }
+
+            return new ContaViewModel
+            {
+                Numero = conta.Numero,
+                Titular = titular,
+                Saldo = conta.Saldo,
+                ClienteId = conta.ClienteId
+            };
+        }
+        public async Task<ContaViewModel?> DepositoAsync(string numero, decimal valor)
+        {
+            if (valor <= 0)
+                throw new ArgumentException("Valor de depósito deve ser maior que zero.", nameof(valor));
+
+            // delega a operação atômica ao repositório
+            var conta = await _contaRepository.DepositarAsync(numero, valor);
             if (conta == null)
                 return null;
 

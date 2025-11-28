@@ -38,7 +38,7 @@ namespace BankDevTrail.Api.Service
             return new ClienteViewModel
             {
                 Nome = cliente.Nome,
-                DataNascimento = cliente.DataNascimento
+                DataNascimento = cliente.DataNascimento                
             };
         }
 

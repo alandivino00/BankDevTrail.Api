@@ -6,5 +6,6 @@ namespace BankDevTrail.Api.Service
     {
         Task<ContaViewModel> CreateContaAsync(ContaInputModel input);
         Task<ContaViewModel?> GetContaAsync(string numero);
+        Task<ContaViewModel?> DepositoAsync(string numero, decimal valor);
     }
 }

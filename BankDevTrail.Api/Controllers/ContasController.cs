@@ -44,5 +44,19 @@ namespace BankDevTrail.Api.Controllers
 
             return Ok(vm);
         }
+
+        // PUT: acrescenta saldo na conta especificada
+        [HttpPut("{numero}/deposito")]
+        public async Task<ActionResult<ContaViewModel>> Deposito(string numero, [FromBody] DepositoInputModel input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var vm = await _service.DepositoAsync(numero, input.Valor);
+            if (vm == null)
+                return NotFound();
+
+            return Ok(vm);
+        }
     }
 }
