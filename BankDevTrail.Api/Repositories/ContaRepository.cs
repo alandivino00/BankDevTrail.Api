@@ -27,7 +27,7 @@ namespace BankDevTrail.Api.Repositories
 
             return await query.FirstOrDefaultAsync(c => c.Numero == numero);
         }
-        public async Task<Conta?> DepositarAsync(string numero, decimal valor)
+        public async Task<Conta?> CreateDepositTransactionAsync(string numero, decimal valor)
         {
             if (valor <= 0)
                 throw new ArgumentException("Valor de depósito deve ser maior que zero.", nameof(valor));

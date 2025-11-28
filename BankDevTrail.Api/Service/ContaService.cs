@@ -77,7 +77,7 @@ namespace BankDevTrail.Api.Service
                 throw new ArgumentException("Valor de depósito deve ser maior que zero.", nameof(valor));
 
             // delega a operação atômica ao repositório
-            var conta = await _contaRepository.DepositarAsync(numero, valor);
+            var conta = await _contaRepository.CreateDepositTransactionAsync(numero, valor);
             if (conta == null)
                 return null;
 
