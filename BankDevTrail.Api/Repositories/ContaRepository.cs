@@ -57,6 +57,34 @@ namespace BankDevTrail.Api.Repositories
             return conta;
         }
 
+        public async Task<Conta?> CreateWithdrawTransactionAsync(string numero, decimal valor)
+        {
+            if (valor <= 0)
+                throw new ArgumentException("Valor de saque deve ser maior que zero.", nameof(valor));
+
+            // obtém a conta rastreada pelo DbContext
+            var conta = await _context.Contas.FirstOrDefaultAsync(c => c.Numero == numero);
+            if (conta == null) return null;
+
+            if (conta.Saldo < valor)
+                throw new InvalidOperationException("Saldo insuficiente para realizar o saque.");
+
+            conta.Saldo -= valor;
+
+            var transacao = new Transacao
+            {
+                Id = Guid.NewGuid(),
+                Valor = valor,
+                DataHora = DateTime.UtcNow,
+                ContaOrigemId = conta.Id,
+                ContaDestinoId = null
+            };
+
+            await _context.Transacoes.AddAsync(transacao);
+            await _context.SaveChangesAsync();
+
+            return conta;
+        }
 
     }
 }

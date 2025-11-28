@@ -58,5 +58,30 @@ namespace BankDevTrail.Api.Controllers
 
             return Ok(vm);
         }
+
+        // POST api/contas/{numero}/saque
+        [HttpPost("{numero}/saque")]
+        public async Task<IActionResult> Saque(string numero, [FromBody] SaqueInputModel input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var vm = await _service.SaqueAsync(numero, input.Valor);
+                if (vm == null) return NotFound();
+                return Ok(vm);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // saldo insuficiente ou regra de negócio
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

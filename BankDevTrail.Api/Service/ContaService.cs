@@ -96,5 +96,29 @@ namespace BankDevTrail.Api.Service
                 ClienteId = conta.ClienteId
             };
         }
+
+        public async Task<ContaViewModel?> SaqueAsync(string numero, decimal valor)
+        {
+            if (valor <= 0)
+                throw new ArgumentException("Valor de saque deve ser maior que zero.", nameof(valor));
+
+            var conta = await _contaRepository.CreateWithdrawTransactionAsync(numero, valor);
+            if (conta == null) return null;
+
+            string titular = string.Empty;
+            if (conta.ClienteId.HasValue)
+            {
+                var cliente = await _clienteRepository.GetByClienteIdAsync(conta.ClienteId.Value, asNoTracking: true);
+                titular = cliente?.Nome ?? string.Empty;
+            }
+
+            return new ContaViewModel
+            {
+                Numero = conta.Numero,
+                Titular = titular,
+                Saldo = conta.Saldo,
+                ClienteId = conta.ClienteId
+            };
+        }
     }
 }
