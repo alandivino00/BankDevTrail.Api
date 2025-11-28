@@ -9,5 +9,6 @@ namespace BankDevTrail.Api.Repositories
         Task<Conta?> GetByNumeroAsync(string numero, bool asNoTracking = true);
         Task<Conta?> CreateDepositTransactionAsync(string numero, decimal valor);
         Task<Conta?> CreateWithdrawTransactionAsync(string numero, decimal valor);
+        Task<(Conta Origem, Conta Destino)?> CreateTransferTransactionAsync(string numeroOrigem, string numeroDestino, decimal valor);
     }
 }

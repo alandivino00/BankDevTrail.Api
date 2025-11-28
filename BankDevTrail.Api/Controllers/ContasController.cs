@@ -83,5 +83,28 @@ namespace BankDevTrail.Api.Controllers
             }
         }
 
+        // POST api/contas/{numero}/transferencia
+        [HttpPost("{numero}/transferencia")]
+        public async Task<IActionResult> Transferencia(string numero, [FromBody] TransferInputModel input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var vm = await _service.TransferirAsync(numero, input.NumeroDestino, input.Valor);
+                if (vm == null) return NotFound();
+                return Ok(vm);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

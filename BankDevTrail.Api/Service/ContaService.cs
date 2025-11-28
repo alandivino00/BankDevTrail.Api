@@ -120,5 +120,45 @@ namespace BankDevTrail.Api.Service
                 ClienteId = conta.ClienteId
             };
         }
+
+        public async Task<TransferResultViewModel?> TransferirAsync(string numeroOrigem, string numeroDestino, decimal valor)
+        {
+            if (valor <= 0)
+                throw new ArgumentException("Valor de transferência deve ser maior que zero.", nameof(valor));
+
+            if (string.Equals(numeroOrigem, numeroDestino, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Conta de origem e destino devem ser diferentes.", nameof(numeroDestino));
+
+            var resultado = await _contaRepository.CreateTransferTransactionAsync(numeroOrigem, numeroDestino, valor);
+            if (resultado == null) return null;
+
+            var (origem, destino) = resultado.Value;
+
+            string titularOrigem = string.Empty;
+            if (origem.ClienteId.HasValue)
+            {
+                var cliente = await _clienteRepository.GetByClienteIdAsync(origem.ClienteId.Value, asNoTracking: true);
+                titularOrigem = cliente?.Nome ?? string.Empty;
+            }
+
+            string titularDestino = string.Empty;
+            if (destino.ClienteId.HasValue)
+            {
+                var cliente = await _clienteRepository.GetByClienteIdAsync(destino.ClienteId.Value, asNoTracking: true);
+                titularDestino = cliente?.Nome ?? string.Empty;
+            }
+
+            return new TransferResultViewModel
+            {
+                NumeroOrigem = origem.Numero,
+                TitularOrigem = titularOrigem,
+                SaldoOrigem = origem.Saldo,
+
+                NumeroDestino = destino.Numero,
+                TitularDestino = titularDestino,
+                SaldoDestino = destino.Saldo
+            };
+        }
+
     }
 }

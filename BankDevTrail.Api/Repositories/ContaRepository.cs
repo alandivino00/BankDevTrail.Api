@@ -86,5 +86,56 @@ namespace BankDevTrail.Api.Repositories
             return conta;
         }
 
+        public async Task<(Conta Origem, Conta Destino)?> CreateTransferTransactionAsync(string numeroOrigem, string numeroDestino, decimal valor)
+        {
+            if (valor <= 0)
+                throw new ArgumentException("Valor de transferência deve ser maior que zero.", nameof(valor));
+
+            if (string.Equals(numeroOrigem, numeroDestino, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Conta de origem e destino devem ser diferentes.", nameof(numeroDestino));
+
+            // carrega as duas contas rastreadas pelo mesmo DbContext
+            var origem = await _context.Contas.FirstOrDefaultAsync(c => c.Numero == numeroOrigem);
+            var destino = await _context.Contas.FirstOrDefaultAsync(c => c.Numero == numeroDestino);
+
+            if (origem == null || destino == null)
+                return null;
+
+            if (origem.Saldo < valor)
+                throw new InvalidOperationException("Saldo insuficiente para realizar a transferência.");
+
+            // aplica mudanças de saldo
+            origem.Saldo -= valor;
+            destino.Saldo += valor;
+
+            // cria duas transações com tipos distintos: TransferenciaEnviada (débito) e TransferenciaRecebida (crédito)
+            var transacaoEnviada = new Transacao
+            {
+                Id = Guid.NewGuid(),
+                Valor = valor,
+                DataHora = DateTime.UtcNow,
+                ContaOrigemId = origem.Id,
+                ContaDestinoId = destino.Id,
+                Tipo = TipoTransacao.TransferenciaEnviada
+            };
+
+            var transacaoRecebida = new Transacao
+            {
+                Id = Guid.NewGuid(),
+                Valor = valor,
+                DataHora = DateTime.UtcNow,
+                ContaOrigemId = origem.Id,
+                ContaDestinoId = destino.Id,
+                Tipo = TipoTransacao.TransferenciaRecebida
+            };
+
+            await _context.Transacoes.AddRangeAsync(transacaoEnviada, transacaoRecebida);
+
+            // Single SaveChangesAsync garante atomicidade
+            await _context.SaveChangesAsync();
+
+            return (origem, destino);
+        }
+
     }
 }
