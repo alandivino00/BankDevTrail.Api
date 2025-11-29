@@ -32,13 +32,25 @@ namespace BankDevTrail.Api.Service
 
         public async Task<ClienteViewModel?> GetClienteAsync(Guid ClienteId)
         {
-            var cliente = await _repo.GetByClienteIdAsync(ClienteId);
+            // solicita o cliente incluindo as contas (o repositório deve incluir as Contas quando apropriado)
+            var cliente = await _repo.GetByClienteIdAsync(ClienteId, asNoTracking: true);
             if (cliente == null) return null;
 
             return new ClienteViewModel
             {
+                Id = cliente.Id,
                 Nome = cliente.Nome,
-                DataNascimento = cliente.DataNascimento                
+                Cpf = cliente.Cpf,
+                DataNascimento = cliente.DataNascimento,
+                Contas = cliente.Contas?
+                    .Select(c => new ContaViewModel
+                    {
+                        Numero = c.Numero,
+                        Titular = cliente.Nome,
+                        Saldo = c.Saldo,
+                        ClienteId = c.ClienteId
+                    })
+                    .ToList() ?? new List<ContaViewModel>()
             };
         }
 
