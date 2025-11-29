@@ -10,5 +10,8 @@ namespace BankDevTrail.Api.Repositories
         Task<Conta?> CreateDepositTransactionAsync(string numero, decimal valor);
         Task<Conta?> CreateWithdrawTransactionAsync(string numero, decimal valor);
         Task<(Conta Origem, Conta Destino)?> CreateTransferTransactionAsync(string numeroOrigem, string numeroDestino, decimal valor);
+        
+        // Novo: recuperar todas as transações relacionadas a uma conta (por número)
+        Task<List<Transacao>?> GetTransacoesByContaNumeroAsync(string numero);
     }
 }

@@ -137,5 +137,19 @@ namespace BankDevTrail.Api.Repositories
             return (origem, destino);
         }
 
+        // Nova implementação: retorna as transações relacionadas a uma conta (por número)
+        public async Task<List<Transacao>?> GetTransacoesByContaNumeroAsync(string numero)
+        {
+            var conta = await _context.Contas.AsNoTracking().FirstOrDefaultAsync(c => c.Numero == numero);
+            if (conta == null) return null;
+
+            var transacoes = await _context.Transacoes
+                .Where(t => t.ContaOrigemId == conta.Id || t.ContaDestinoId == conta.Id)
+                .OrderByDescending(t => t.DataHora)
+                .ToListAsync();
+
+            return transacoes;
+        }
+
     }
 }

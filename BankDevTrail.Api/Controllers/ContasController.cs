@@ -106,5 +106,15 @@ namespace BankDevTrail.Api.Controllers
             }
         }
 
+        // GET api/contas/{numero}/extrato
+        [HttpGet("{numero}/extrato")]
+        public async Task<IActionResult> Extrato(string numero)
+        {
+            var vm = await _service.GetExtratoAsync(numero);
+            if (vm == null) return NotFound();
+
+            return Ok(vm);
+        }
+
     }
 }

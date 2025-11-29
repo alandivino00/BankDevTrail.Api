@@ -160,5 +160,26 @@ namespace BankDevTrail.Api.Service
             };
         }
 
+        // Nova implementação: retorna extrato (lista de transações) de uma conta
+        public async Task<List<TransacaoViewModel>?> GetExtratoAsync(string numero)
+        {
+            var transacoes = await _contaRepository.GetTransacoesByContaNumeroAsync(numero);
+            if (transacoes == null) return null;
+
+            var result = transacoes
+                .Select(t => new TransacaoViewModel
+                {
+                    Id = t.Id,
+                    Valor = t.Valor,
+                    DataHora = (DateTime)t.DataHora,
+                    Tipo = t.Tipo,
+                    ContaOrigemId = t.ContaOrigemId,
+                    ContaDestinoId = t.ContaDestinoId
+                })
+                .ToList();
+
+            return result;
+        }
+
     }
 }
