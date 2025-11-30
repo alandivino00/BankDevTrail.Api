@@ -57,3 +57,7 @@ Endpoints principais
 - POST `/api/contas/{numero}/saque` — saque (body: `{ "valor": 50 }`)
 - POST `/api/contas/{numero}/transferencia` — transferência (body: `{ "numeroDestino": "B1", "valor": 30 }`) — `{numero}` é a conta origem
 - GET `/api/contas/{numero}/extrato` — extrato (todas as transações da conta)
+
+Avatar do southpark
+-------------------
+- Disponível no link: https://drive.google.com/drive/folders/1ldsDpvyB0UdIF_QIyxUPT5LDmijABZLA?usp=sharing

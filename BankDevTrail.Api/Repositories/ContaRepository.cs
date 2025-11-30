@@ -46,8 +46,8 @@ namespace BankDevTrail.Api.Repositories
                 Valor = valor,
                 DataHora = DateTime.UtcNow,
                 ContaOrigemId = null,
-                ContaDestinoId = conta.Id
-                // preencha outros campos de Transacao se existirem (ex.: Tipo)
+                ContaDestinoId = conta.Id,
+                Tipo = TipoTransacao.Deposito
             };
 
             // adiciona transação e persiste tudo em um único SaveChangesAsync
@@ -77,7 +77,8 @@ namespace BankDevTrail.Api.Repositories
                 Valor = valor,
                 DataHora = DateTime.UtcNow,
                 ContaOrigemId = conta.Id,
-                ContaDestinoId = null
+                ContaDestinoId = null,
+                Tipo = TipoTransacao.Saque
             };
 
             await _context.Transacoes.AddAsync(transacao);
